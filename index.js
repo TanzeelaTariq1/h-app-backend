@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import connectDB from './config/db.js'; // Import the connectDB function
 
 import UserRoutes from './routes/UserRoutes.js'; // Import the UserRoutes
+import ComplaintsRoutes from './routes/ComplaintsRoutes.js'; // Import the UserRoutes
 import UploadRoutes from './routes/UploadRoutes.js';
 import AdminRoutes from './routes/AdminRoutes.js';
 
@@ -25,6 +26,7 @@ app.get('/health', (req, res) => {
 
 //Api routes
 app.use('/api/users', UserRoutes); // Use the UserRoutes for /api/users
+app.use('/api/complaints', ComplaintsRoutes); // Use the UserRoutes for /api/users
 //app.use('/api/upload', UploadRoutes); //  
 //app.use('/api/admin', AdminRoutes);
 

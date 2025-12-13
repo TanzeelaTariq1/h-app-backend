@@ -4,11 +4,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "build":"npm install",
-    "start": "node index.js",
-    "dev": "nodemon backend/index.js",
+   "start": "node index.js",
+    "dev": "nodemon index.js",
     "seed": "node seeder.js"
-
   },
   "keywords": [],
   "author": "",

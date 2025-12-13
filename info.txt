@@ -1,0 +1,12 @@
+mongodb
+username:
+zeshanzee1993
+password:
+Fn313Vi5lX1aRJAE
+
+
+. Add a connection IP address
+
+Your current IP address (103.167.159.247) has been added to enable local connectivity.
+ Only an IP address you add to your Access List will be able to connect to your project's clusters.
+ Add another later in Network Access

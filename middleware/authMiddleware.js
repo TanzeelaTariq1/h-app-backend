@@ -1,40 +1,74 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
- 
 
-
-//Middleware to protect routes
+// Middleware to protect routes
 const protect = async (req, res, next) => {
     let token;
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        try {
-            token = req.headers.authorization.split(' ')[1];
-            //verify the token
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            //get the user from the token
-            req.user = await User.findById(decoded.user.id).select('-password'); //exclude the password from the user object
-            next(); //call the next middleware or route handler
-        } catch (error) {
-            console.error("Token Verification failed", error);
-            res.status(401).json({ message: 'Not authorized, token failed' });
-        }
-    } else {
-        res.status(401).json({ message: 'Not authorized, no token provided' });
+    
+    console.log('🔍 Auth check - URL:', req.url);
+    console.log('🔍 Auth check - Query params:', req.query);
+    console.log('🔍 Auth check - Headers:', req.headers);
+    
+    // Try to get token from QUERY PARAMETERS first (for Android app)
+    if (req.query.Authorization) {
+        token = req.query.Authorization;
+        console.log('✅ Token from query parameter');
+    }
+    // Try to get token from HEADERS (for Postman/web)
+    else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+        console.log('✅ Token from header');
+    }
+    
+    if (!token) {
+        console.log('❌ No token found');
+        return res.status(401).json({ 
+            success: false,
+            message: 'Not authorized, no token provided' 
+        });
     }
 
+    try {
+        console.log('🔐 Verifying token:', token.substring(0, 20) + '...');
+        
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('✅ Token decoded:', decoded);
+        
+        // Get the user from the token
+        req.user = await User.findById(decoded.user.id).select('-password');
+        
+        if (!req.user) {
+            console.log('❌ User not found in database');
+            return res.status(401).json({ 
+                success: false,
+                message: 'User not found' 
+            });
+        }
+        
+        console.log('✅ User authenticated:', req.user.email, 'Role:', req.user.role);
+        next(); // Call the next middleware or route handler
+    } catch (error) {
+        console.error('❌ Token verification failed:', error.message);
+        res.status(401).json({ 
+            success: false,
+            message: 'Not authorized, token failed: ' + error.message 
+        });
+    }
 }
 
-//Middleware to check if the user is an admin
+// Middleware to check if the user is an admin
 const admin = (req, res, next) => {
     if (req.user && req.user.role === 'admin') {
-        next(); //call the next middleware or route handler
+        console.log('✅ User is admin');
+        next(); // Call the next middleware or route handler
     } else {
-        res.status(403).json({ message: 'Not authorized as an admin' });
+        console.log('❌ User is NOT admin. Role:', req.user?.role);
+        res.status(403).json({ 
+            success: false,
+            message: 'Not authorized as an admin. Your role: ' + (req.user?.role || 'unknown')
+        });
     }
 }
- 
- 
 
-
- 
-export { protect, admin };  
+export { protect, admin };

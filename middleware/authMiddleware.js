@@ -10,13 +10,18 @@ const protect = async (req, res, next) => {
     console.log('🔍 Auth check - Headers:', req.headers);
     
     // Try to get token from QUERY PARAMETERS first (for Android app)
-    if (req.query.Authorization) {
-        token = req.query.Authorization;
+    if (req.query && (req.query.Authorization || req.query.authorization || req.query.token)) {
+        token = req.query.Authorization || req.query.authorization || req.query.token;
         console.log('✅ Token from query parameter');
     }
     // Try to get token from HEADERS (for Postman/web)
-    else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1];
+    else if (req.headers && req.headers.authorization) {
+        // header may be "Bearer <token>" or just the token
+        if (req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1];
+        } else {
+            token = req.headers.authorization;
+        }
         console.log('✅ Token from header');
     }
     

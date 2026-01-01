@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
 
 
 
@@ -14,6 +13,12 @@ const complainSchema = new mongoose.Schema({
         required: true,
       
 
+    },
+    // reference to the user who created the complaint/suggestion
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: false,
     },
     description: {
         type: String,

@@ -12,7 +12,7 @@ const complainSchema = new mongoose.Schema({
     phoneno: {
         type: Number,
         required: true,
-        unique: true,
+      
 
     },
     description: {
